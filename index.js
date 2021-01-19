@@ -163,7 +163,7 @@ function updatePixels(effect) {
 function applyOriginalFilter(filter) {
     if (fileOpener.value) {
         document.querySelectorAll('button').forEach(el => {
-            if (el.classList.value !== 'original') {
+            if (el.classList.value !== 'original' && el.id !== 'resetFilters') {
                 el.disabled = true;
             } else {
                 if (el.id === filter) {
@@ -189,6 +189,9 @@ function resetFilters() {
     });
     document.querySelectorAll('button').forEach(el => {
         el.disabled = false;
+        el.style.background = '';
+        el.style.color = '';
+        el.style.borderColor = '';
     });
     if (fileOpener.value) {
         const ctx = mainCanvas.getContext("2d");
