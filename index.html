@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lena.js Demo</title>
+    <style>
+        body, #container { 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #container {
+            flex-direction: column;
+            background: #097;
+            width: 400px;
+            height: 600px;
+        }
+
+        #fileOpener {
+            margin: 10px 0;
+        }
+
+        .count {
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <canvas id="mainCanvas" width='300' height='450'></canvas>
+        <input type="file" name="fileOpener" id="fileOpener" />
+        <div class="filters">
+            <button id="gaussian">Gaussian</button>
+            <span id="gaussian-count" class="count"></span>
+            <button id="sharpen">Sharpen</button>
+            <span id="sharpen-count" class="count"></span>
+            <button id="grayscale">Grayscale</button>
+            <span id="grayscale-count"></span>
+        </div>
+    </div>
+    <script src='/node_modules/lena.js/dist/browser.js'></script>
+    <script src='/index.js'></script>
+</body>
+</html>
