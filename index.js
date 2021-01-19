@@ -17,6 +17,9 @@ window.onload = () => {
 }
 
 fileOpener.onchange = (e) => {
+    document.querySelectorAll('.count').forEach(count => {
+        count.innerHTML = '';
+    });
     newImage.style.width = '300px';
     newImage.style.height = '450px';
     const photo = e.target.files[0];
@@ -28,8 +31,6 @@ fileOpener.onchange = (e) => {
     
     newImage.addEventListener('load', () => {
         const ctx = mainCanvas.getContext("2d");
-        mainCanvas.style.width = '300px';
-        mainCanvas.style.height = '450px';
         ctx.drawImage(newImage, 0, 0, 300, 450);
     });
 }
@@ -56,6 +57,15 @@ function applyFilter(filter) {
         } else {
             LenaJS.filterImage(mainCanvas, LenaJS[filter], newImage);
         }
+    }    
+}
+
+function resetFilters() {
+    document.querySelectorAll('.count').forEach(count => {
+        count.innerHTML = '';
+    });
+    if (fileOpener.value) {
+        const ctx = mainCanvas.getContext("2d");
+        ctx.drawImage(newImage, 0, 0, 300, 450);
     }
-    
 }

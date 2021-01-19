@@ -25,6 +25,11 @@
         .mr-15 {
             margin-right: 15px;
         }
+
+        #resetFilters {
+            width: 80%;
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
@@ -39,6 +44,7 @@
             <button id="grayscale" onclick="applyFilter('grayscale')">Grayscale</button>
             <span id="grayscale-count" class="count"></span>
         </div>
+        <button id="resetFilters" onclick="resetFilters();">Reset all filters</button>
     </div>
     <script src='/node_modules/lena.js/dist/browser.js'></script>
     <script src='/index.js'></script>
