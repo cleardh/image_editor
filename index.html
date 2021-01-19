@@ -13,7 +13,7 @@
 
         #container {
             flex-direction: column;
-            background: #097;
+            background: #097c89;
             width: 400px;
             height: 600px;
         }
@@ -22,7 +22,7 @@
             margin: 10px 0;
         }
 
-        .count {
+        .mr-15 {
             margin-right: 15px;
         }
     </style>
@@ -32,12 +32,12 @@
         <canvas id="mainCanvas" width='300' height='450'></canvas>
         <input type="file" name="fileOpener" id="fileOpener" />
         <div class="filters">
-            <button id="gaussian">Gaussian</button>
-            <span id="gaussian-count" class="count"></span>
-            <button id="sharpen">Sharpen</button>
-            <span id="sharpen-count" class="count"></span>
-            <button id="grayscale">Grayscale</button>
-            <span id="grayscale-count"></span>
+            <button id="gaussian" onclick="applyFilter('gaussian')">Gaussian</button>
+            <span id="gaussian-count" class="count mr-15"></span>
+            <button id="sharpen" onclick="applyFilter('sharpen')">Sharpen</button>
+            <span id="sharpen-count" class="count mr-15"></span>
+            <button id="grayscale" onclick="applyFilter('grayscale')">Grayscale</button>
+            <span id="grayscale-count" class="count"></span>
         </div>
     </div>
     <script src='/node_modules/lena.js/dist/browser.js'></script>
