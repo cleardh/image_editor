@@ -188,10 +188,12 @@ function resetFilters() {
         count.innerHTML = '';
     });
     document.querySelectorAll('button').forEach(el => {
-        el.disabled = false;
-        el.style.background = '';
-        el.style.color = '';
-        el.style.borderColor = '';
+        if (el.id !== 'raw') {
+            el.disabled = false;
+            el.style.background = '';
+            el.style.color = '';
+            el.style.borderColor = '';
+        }
     });
     if (fileOpener.value) {
         const ctx = mainCanvas.getContext("2d");
