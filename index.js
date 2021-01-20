@@ -69,7 +69,6 @@ function applyFilter(filter) {
 }
 
 function applySepia(pixels, adj) {
-    console.log('before: ', pixels.data[0], pixels.data[1], pixels.data[2]);
     let d = pixels.data;
     for (let i = 0; i < d.length; i += 4) {
         let r = d[i], g = d[i + 1], b = d[i + 2];
@@ -77,7 +76,6 @@ function applySepia(pixels, adj) {
         d[i + 1] = (r * .349 * adj) + (g * (1 - (0.314 * adj))) + (b * .168 * adj);
         d[i + 2] = (r * .272 * adj) + (g * .534 * adj) + (b * (1 - (0.869 * adj)));
     }
-    console.log('after: ', pixels.data[0], pixels.data[1], pixels.data[2]);
     return pixels;
 }
 
@@ -119,11 +117,12 @@ function applySaturation(pixels, adj) {
     return pixels;
 };
 
-function applyGrayscale(pixels) {
+function applyGrayscale(pixels, adj0, adj1, adj2) {
     let d = pixels.data;
     for (let i = 0; i < d.length; i += 4) {
         let r = d[i], g = d[i + 1], b = d[i + 2];
-        let avg = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        let avg = adj0 * r + adj1 * g + adj2 * b;
+        // let avg = 0.2126 * r + 0.7152 * g + 0.0722 * b;
         d[i] = d[i + 1] = d[i + 2] = avg;
     }
     return pixels;
@@ -150,8 +149,8 @@ function updatePixels(effect, adj) {
                 // To be implemented (using glfx)
                 break;
             case 'mono':
-                pixels = applyGrayscale(pixels, adj.val0 * 1);
-                pixels = applyContrast(pixels, adj.val1 * 1);
+                pixels = applyGrayscale(pixels, adj.val0 * 1, adj.val1 * 1, adj.val2 * 1);
+                pixels = applyContrast(pixels, adj.val3 * 1);
                 break;
             default:
                 break;
@@ -291,21 +290,47 @@ function applyOriginalFilter(filter) {
                 `;
                 handleValueChange('glass');
                 break;
+            case 'raw':
+                filterContainer.style.display = '';
+                valueContainer.style.display = 'none';
+                const canvas = fx.canvas();
+                const texture = canvas.texture(newImage);
+                canvas.draw(texture).vignette(0.1, 0.5).denoise(170).update();
+                const ctx = mainCanvas.getContext("2d");
+                ctx.drawImage(canvas, 0, 0, 300, 450);
+                break;
             case 'mono':
                 // pixels = applyGrayscale(pixels, 1);
                 // pixels = applyContrast(pixels, 0.05);
+                // let avg = 0.2126 * r + 0.7152 * g + 0.0722 * b;
                 defaultValues.mono = {
-                    grayscale: 1,
+                    red: 0.2126,
+                    green: 0.7152,
+                    blue: 0.0722,
                     contrast: 0.05
                 }
                 valueContainer.innerHTML = `
                     <table style="margin-top: 15px;">
                         <tr>
-                            <td>Grayscale</td>
+                            <td>Red</td>
                             <td>
-                                <input id="grayscale-value" class="newValues" oninput="handleValueChange('mono');" onchange="handleValueChange('mono');" type="range" min="0" max="5" step="0.05" value=${defaultValues.mono.grayscale} style="margin-left: 5px;" />
+                                <input id="red-value" class="newValues" oninput="handleValueChange('mono');" onchange="handleValueChange('mono');" type="range" min="0" max="1" step="0.0001" value=${defaultValues.mono.red} style="margin-left: 5px;" />
                             </td>
-                            <td><span id="grayscaleValue">${defaultValues.mono.grayscale}</span></td>
+                            <td><span id="redValue">${defaultValues.mono.red}</span></td>
+                        </tr>
+                        <tr>
+                            <td>Green</td>
+                            <td>
+                                <input id="green-value" class="newValues" oninput="handleValueChange('mono');" onchange="handleValueChange('mono');" type="range" min="0" max="1" step="0.0001" value=${defaultValues.mono.green} style="margin-left: 5px;" />
+                            </td>
+                            <td><span id="greenValue">${defaultValues.mono.green}</span></td>
+                        </tr>
+                        <tr>
+                            <td>Blue</td>
+                            <td>
+                                <input id="blue-value" class="newValues" oninput="handleValueChange('mono');" onchange="handleValueChange('mono');" type="range" min="0" max="1" step="0.0001" value=${defaultValues.mono.blue} style="margin-left: 5px;" />
+                            </td>
+                            <td><span id="blueValue">${defaultValues.mono.blue}</span></td>
                         </tr>
                         <tr>
                             <td>Contrast</td>
@@ -362,12 +387,10 @@ function resetFilters() {
         count.innerHTML = '';
     });
     document.querySelectorAll('button').forEach(el => {
-        if (el.id !== 'raw') {
-            el.disabled = false;
-            el.style.background = '';
-            el.style.color = '';
-            el.style.borderColor = '';
-        }
+        el.disabled = false;
+        el.style.background = '';
+        el.style.color = '';
+        el.style.borderColor = '';
     });
     if (fileOpener.value) {
         resetImage();

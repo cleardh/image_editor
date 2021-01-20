@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "glfx": "0.0.4",
     "lena.js": "^0.8.0"
   }
 }
