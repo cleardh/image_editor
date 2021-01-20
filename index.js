@@ -310,7 +310,7 @@ function applyOriginalFilter(filter) {
                     contrast: 0.05
                 }
                 valueContainer.innerHTML = `
-                    <table style="margin-top: 15px;">
+                    <table style="margin-top: 5px;">
                         <tr>
                             <td>Red</td>
                             <td>
@@ -341,7 +341,7 @@ function applyOriginalFilter(filter) {
                         </tr>
                         <tr>
                             <td colspan="3">
-                                <button style="width: 100%; margin-top: 10px;" onclick="backToOriginal('mono');">Reset</button>
+                                <button style="width: 100%;" onclick="backToOriginal('mono');">Reset</button>
                             </td>
                         </tr>
                     </table>
