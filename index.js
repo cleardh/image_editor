@@ -5,11 +5,15 @@
 const fileOpener = document.getElementById('fileOpener');
 const mainCanvas = document.getElementById('mainCanvas');
 
+const filterContainer = document.getElementById('filter-container');
+const valueContainer = document.getElementById('value-container');
 const btnGaussian = document.getElementById('btnGaussian');
 const btnSharpen = document.getElementById('btnSharpen');
 const btnGrayscale = document.getElementById('btnGrayscale');
 
 const newImage = document.createElement('img');
+
+const defaultValues = {};
 
 window.onload = () => {
     document.querySelector('body').style.width = `${window.innerWidth}px`;
@@ -30,8 +34,7 @@ fileOpener.onchange = (e) => {
     reader.readAsDataURL(photo);
     
     newImage.addEventListener('load', () => {
-        const ctx = mainCanvas.getContext("2d");
-        ctx.drawImage(newImage, 0, 0, 300, 450);
+        resetImage();
     });
 }
 
@@ -62,7 +65,6 @@ function applyFilter(filter) {
         } else {
             LenaJS.filterImage(mainCanvas, LenaJS[filter], newImage);
         }
-        // console.log(mainCanvas.getContext('2d').getImageData(0, 0, 300, 450));
     }    
 }
 
@@ -125,29 +127,29 @@ function applyGrayscale(pixels) {
     return pixels;
 };
 
-function updatePixels(effect) {
+function updatePixels(effect, adj) {
     const p = new Promise((resolve) => {
         let pixels = mainCanvas.getContext("2d").getImageData(0, 0, 300, 450);
         switch (effect) {
             case 'flair':
-                pixels = applySepia(pixels, 0.04 * .5);
-                pixels = applyContrast(pixels, -0.15 * .5);
+                pixels = applySepia(pixels, adj.val0 * .5);
+                pixels = applyContrast(pixels, adj.val1 * .5);
                 break;
             case 'prime':
-                pixels = applyBrightness(pixels, 0.1 * .3);
-                pixels = applyContrast(pixels, 0.1 * .3);
-                pixels = applySaturation(pixels, 0.15 * .3);
+                pixels = applyBrightness(pixels, adj.val0 * .3);
+                pixels = applyContrast(pixels, adj.val1 * .3);
+                pixels = applySaturation(pixels, adj.val2 * .3);
                 break;
             case 'glass':
-                pixels = applyContrast(pixels, -0.15);
-                pixels = applySaturation(pixels, 0.1);
+                pixels = applyContrast(pixels, adj.val0 * 1);
+                pixels = applySaturation(pixels, adj.val1 * 1);
                 break;
             case 'raw':
-                // To be implemented
+                // To be implemented (using glfx)
                 break;
             case 'mono':
-                pixels = applyGrayscale(pixels, 1);
-                pixels = applyContrast(pixels, 0.05);
+                pixels = applyGrayscale(pixels, adj.val0 * 1);
+                pixels = applyContrast(pixels, adj.val1 * 1);
                 break;
             default:
                 break;
@@ -177,10 +179,180 @@ function applyOriginalFilter(filter) {
                 }
             }
         });
-        const ctx = mainCanvas.getContext("2d");
-        ctx.drawImage(newImage, 0, 0, 300, 450);
-        updatePixels(filter);
+        resetImage();
+
+        filterContainer.style.display = 'none';
+        valueContainer.style.display = '';
+        switch (filter) {
+            case 'flair':
+                 // pixels = applySepia(pixels, 0.04 * .5);
+                // pixels = applyContrast(pixels, -0.15 * .5);
+                defaultValues.flair = {
+                    sepia: 0.04,
+                    contrast: -0.15
+                }
+                valueContainer.innerHTML = `
+                    <table style="margin-top: 15px;">
+                        <tr>
+                            <td>Sepia</td>
+                            <td>
+                                <input id="sepia-value" class="newValues" oninput="handleValueChange('flair');" onchange="handleValueChange('flair');" type="range" min="0" max="0.1" step="0.005" value=${defaultValues.flair.sepia} style="margin-left: 5px;" />
+                            </td>
+                            <td><span id="sepiaValue">${defaultValues.flair.sepia}</span></td>
+                        </tr>
+                        <tr>
+                            <td>Contrast</td>
+                            <td>
+                                <input id="contrast-value" class="newValues" oninput="handleValueChange('flair');" onchange="handleValueChange('flair');" type="range" min="-0.2" max="0" step="0.005" value=${defaultValues.flair.contrast} style="margin-left: 5px;" />        
+                            </td>
+                            <td><span id="contrastValue">${defaultValues.flair.contrast}</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <button style="width: 100%; margin-top: 10px;" onclick="backToOriginal('flair');">Reset</button>
+                            </td>
+                        </tr>
+                    </table>
+                `;
+                handleValueChange('flair');
+                break;
+            case 'prime':
+                // pixels = applyBrightness(pixels, 0.1 * .3);
+                // pixels = applyContrast(pixels, 0.1 * .3);
+                // pixels = applySaturation(pixels, 0.15 * .3);
+                defaultValues.prime = {
+                    brightness: 0.1,
+                    contrast: 0.1,
+                    saturation: 0.15
+                }
+                valueContainer.innerHTML = `
+                    <table style="margin-top: 15px;">
+                        <tr>
+                            <td>Brightness</td>
+                            <td>
+                                <input id="brightness-value" class="newValues" oninput="handleValueChange('prime');" onchange="handleValueChange('prime');" type="range" min="0" max="1" step="0.05" value=${defaultValues.prime.brightness} style="margin-left: 5px;" />
+                            </td>
+                            <td><span id="brightnessValue">${defaultValues.prime.brightness}</span></td>
+                        </tr>
+                        <tr>
+                            <td>Contrast</td>
+                            <td>
+                                <input id="contrast-value" class="newValues" oninput="handleValueChange('prime');" onchange="handleValueChange('prime');" type="range" min="0" max="1" step="0.05" value=${defaultValues.prime.contrast} style="margin-left: 5px;" />        
+                            </td>
+                            <td><span id="contrastValue">${defaultValues.prime.contrast}</span></td>
+                        </tr>
+                        <tr>
+                            <td>Saturation</td>
+                            <td>
+                                <input id="saturation-value" class="newValues" oninput="handleValueChange('prime');" onchange="handleValueChange('prime');" type="range" min="0" max="1" step="0.05" value=${defaultValues.prime.saturation} style="margin-left: 5px;" />        
+                            </td>
+                            <td><span id="saturationValue">${defaultValues.prime.saturation}</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <button style="width: 100%; margin-top: 10px;" onclick="backToOriginal('prime');">Reset</button>
+                            </td>
+                        </tr>
+                    </table>
+                `;
+                handleValueChange('prime');
+                break;
+            case 'glass':
+                // pixels = applyContrast(pixels, -0.15);
+                // pixels = applySaturation(pixels, 0.1);
+                defaultValues.glass = {
+                    contrast: -0.15,
+                    saturation: 0.1
+                }
+                valueContainer.innerHTML = `
+                    <table style="margin-top: 15px;">
+                        <tr>
+                            <td>Contrast</td>
+                            <td>
+                                <input id="contrast-value" class="newValues" oninput="handleValueChange('glass');" onchange="handleValueChange('glass');" type="range" min="-0.2" max="-0.1" step="0.005" value=${defaultValues.glass.contrast} style="margin-left: 5px;" />        
+                            </td>
+                            <td><span id="contrastValue">${defaultValues.glass.contrast}</span></td>
+                        </tr>
+                        <tr>
+                            <td>Saturation</td>
+                            <td>
+                                <input id="saturation-value" class="newValues" oninput="handleValueChange('glass');" onchange="handleValueChange('glass');" type="range" min="0" max="1" step="0.05" value=${defaultValues.glass.saturation} style="margin-left: 5px;" />        
+                            </td>
+                            <td><span id="saturationValue">${defaultValues.glass.saturation}</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <button style="width: 100%; margin-top: 10px;" onclick="backToOriginal('glass');">Reset</button>
+                            </td>
+                        </tr>
+                    </table>
+                `;
+                handleValueChange('glass');
+                break;
+            case 'mono':
+                // pixels = applyGrayscale(pixels, 1);
+                // pixels = applyContrast(pixels, 0.05);
+                defaultValues.mono = {
+                    grayscale: 1,
+                    contrast: 0.05
+                }
+                valueContainer.innerHTML = `
+                    <table style="margin-top: 15px;">
+                        <tr>
+                            <td>Grayscale</td>
+                            <td>
+                                <input id="grayscale-value" class="newValues" oninput="handleValueChange('mono');" onchange="handleValueChange('mono');" type="range" min="0" max="5" step="0.05" value=${defaultValues.mono.grayscale} style="margin-left: 5px;" />
+                            </td>
+                            <td><span id="grayscaleValue">${defaultValues.mono.grayscale}</span></td>
+                        </tr>
+                        <tr>
+                            <td>Contrast</td>
+                            <td>
+                                <input id="contrast-value" class="newValues" oninput="handleValueChange('mono');" onchange="handleValueChange('mono');" type="range" min="0" max="0.5" step="0.005" value=${defaultValues.mono.contrast} style="margin-left: 5px;" />
+                            </td>
+                            <td><span id="contrastValue">${defaultValues.mono.contrast}</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <button style="width: 100%; margin-top: 10px;" onclick="backToOriginal('mono');">Reset</button>
+                            </td>
+                        </tr>
+                    </table>
+                `;
+                handleValueChange('mono');
+                break;
+            default:
+                break;
+        }
     }
+}
+
+function handleValueChange(filter) {
+    resetImage();
+    const newValues = document.getElementsByClassName('newValues');
+    const valObj = {};
+    for (let i = 0; i < newValues.length; i++) {
+        valObj[`val${i}`] = newValues[i].value;
+        const effect = newValues[i].id.split('-')[0];
+        setValue(effect);
+        
+    }
+    updatePixels(filter, valObj);
+}
+
+function backToOriginal(filter) {
+    resetImage();
+    const newValues = document.getElementsByClassName('newValues');
+    for (let i = 0; i < newValues.length; i++) {
+        const effect = newValues[i].id.split('-')[0];
+        newValues[i].value = defaultValues[filter][effect];
+        setValue(effect);
+    }
+    handleValueChange(filter);
+}
+
+function setValue(effect) {
+    document.getElementById(`${effect}Value`).innerHTML = document.getElementById(`${effect}-value`).value;
 }
 
 function resetFilters() {
@@ -196,7 +368,13 @@ function resetFilters() {
         }
     });
     if (fileOpener.value) {
-        const ctx = mainCanvas.getContext("2d");
-        ctx.drawImage(newImage, 0, 0, 300, 450);
+        resetImage();
     }
+    filterContainer.style.display = '';
+    valueContainer.style.display = 'none';
+}
+
+function resetImage() {
+    const ctx = mainCanvas.getContext("2d");
+    ctx.drawImage(newImage, 0, 0, 300, 450);
 }
