@@ -69,6 +69,7 @@ function applyFilter(filter) {
 }
 
 function applySepia(pixels, adj) {
+    console.log('before: ', pixels.data[0], pixels.data[1], pixels.data[2]);
     let d = pixels.data;
     for (let i = 0; i < d.length; i += 4) {
         let r = d[i], g = d[i + 1], b = d[i + 2];
@@ -76,6 +77,7 @@ function applySepia(pixels, adj) {
         d[i + 1] = (r * .349 * adj) + (g * (1 - (0.314 * adj))) + (b * .168 * adj);
         d[i + 2] = (r * .272 * adj) + (g * .534 * adj) + (b * (1 - (0.869 * adj)));
     }
+    console.log('after: ', pixels.data[0], pixels.data[1], pixels.data[2]);
     return pixels;
 }
 
@@ -196,7 +198,7 @@ function applyOriginalFilter(filter) {
                         <tr>
                             <td>Sepia</td>
                             <td>
-                                <input id="sepia-value" class="newValues" oninput="handleValueChange('flair');" onchange="handleValueChange('flair');" type="range" min="0" max="0.1" step="0.005" value=${defaultValues.flair.sepia} style="margin-left: 5px;" />
+                                <input id="sepia-value" class="newValues" oninput="handleValueChange('flair');" onchange="handleValueChange('flair');" type="range" min="0" max="0.5" step="0.05" value=${defaultValues.flair.sepia} style="margin-left: 5px;" />
                             </td>
                             <td><span id="sepiaValue">${defaultValues.flair.sepia}</span></td>
                         </tr>
