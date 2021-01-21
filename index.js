@@ -186,27 +186,27 @@ function applyOriginalFilter(filter) {
         valueContainer.style.display = '';
         switch (filter) {
             case 'glass':
-                 // pixels = applySepia(pixels, 0.04 * .5);
-                // pixels = applyContrast(pixels, -0.15 * .5);
+                // pixels = applyContrast(pixels, -0.15);
+                // pixels = applySaturation(pixels, 0.1);
                 defaultValues.glass = {
-                    sepia: 0.04,
-                    contrast: -0.15
+                    contrast: -0.15,
+                    saturation: 0.1
                 }
                 valueContainer.innerHTML = `
                     <table style="margin-top: 15px;">
                         <tr>
-                            <td>Sepia</td>
-                            <td>
-                                <input id="sepia-value" class="newValues" oninput="handleValueChange('glass');" onchange="handleValueChange('glass');" type="range" min="0" max="0.5" step="0.05" value=${defaultValues.glass.sepia} style="margin-left: 5px;" />
-                            </td>
-                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'sepia');" id="sepiaValue">${defaultValues.glass.sepia}</span></td>
-                        </tr>
-                        <tr>
                             <td>Contrast</td>
                             <td>
-                                <input id="contrast-value" class="newValues" oninput="handleValueChange('glass');" onchange="handleValueChange('glass');" type="range" min="-0.2" max="0" step="0.005" value=${defaultValues.glass.contrast} style="margin-left: 5px;" />        
+                                <input id="contrast-value" class="newValues" oninput="handleValueChange('glass');" onchange="handleValueChange('glass');" type="range" min="-0.2" max="-0.1" step="0.005" value=${defaultValues.glass.contrast} style="margin-left: 5px;" />        
                             </td>
-                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'contrast');" id="contrastValue">${defaultValues.glass.contrast}</span></td>
+                            <td><span id="contrastValue">${defaultValues.glass.contrast}</span></td>
+                        </tr>
+                        <tr>
+                            <td>Saturation</td>
+                            <td>
+                                <input id="saturation-value" class="newValues" oninput="handleValueChange('glass');" onchange="handleValueChange('glass');" type="range" min="0" max="1" step="0.05" value=${defaultValues.glass.saturation} style="margin-left: 5px;" />        
+                            </td>
+                            <td><span id="saturationValue">${defaultValues.glass.saturation}</span></td>
                         </tr>
                         <tr>
                             <td colspan="3">
