@@ -132,23 +132,19 @@ function updatePixels(effect, adj) {
     const p = new Promise((resolve) => {
         let pixels = mainCanvas.getContext("2d").getImageData(0, 0, 300, 450);
         switch (effect) {
-            case 'flair':
-                pixels = applySepia(pixels, adj.val0 * .5);
-                pixels = applyContrast(pixels, adj.val1 * .5);
-                break;
-            case 'prime':
-                pixels = applyBrightness(pixels, adj.val0 * .3);
-                pixels = applyContrast(pixels, adj.val1 * .3);
-                pixels = applySaturation(pixels, adj.val2 * .3);
-                break;
             case 'glass':
                 pixels = applyContrast(pixels, adj.val0 * 1);
                 pixels = applySaturation(pixels, adj.val1 * 1);
                 break;
-            case 'raw':
-                // To be implemented (using glfx)
+            case 'flair':
+                pixels = applySepia(pixels, adj.val0 * .5);
+                pixels = applyContrast(pixels, adj.val1 * .5);
                 break;
-            case 'mono':
+            case 'dusk':
+                pixels = applyBrightness(pixels, adj.val0 * 1);
+                pixels = applySaturation(pixels, adj.val1 * 1);
+                break;
+            case 'chrome':
                 pixels = applyGrayscale(pixels, adj.val0 * 1, adj.val1 * 1, adj.val2 * 1);
                 pixels = applyContrast(pixels, adj.val3 * 1);
                 break;
@@ -159,6 +155,13 @@ function updatePixels(effect, adj) {
     });
     p.then((newPixels) => {
         mainCanvas.getContext("2d").putImageData(newPixels, 0, 0);
+        if (effect === 'glass') {
+            const canvas = fx.canvas();
+            const texture = canvas.texture(mainCanvas);
+            canvas.draw(texture).denoise(140).update();
+            const ctx = mainCanvas.getContext("2d");
+            ctx.drawImage(canvas, 0, 0, 300, 450);
+        }
     });
 }
 
@@ -185,79 +188,6 @@ function applyOriginalFilter(filter) {
         filterContainer.style.display = 'none';
         valueContainer.style.display = '';
         switch (filter) {
-            case 'flair':
-                 // pixels = applySepia(pixels, 0.04 * .5);
-                // pixels = applyContrast(pixels, -0.15 * .5);
-                defaultValues.flair = {
-                    sepia: 0.04,
-                    contrast: -0.15
-                }
-                valueContainer.innerHTML = `
-                    <table style="margin-top: 15px;">
-                        <tr>
-                            <td>Sepia</td>
-                            <td>
-                                <input id="sepia-value" class="newValues" oninput="handleValueChange('flair');" onchange="handleValueChange('flair');" type="range" min="0" max="0.5" step="0.05" value=${defaultValues.flair.sepia} style="margin-left: 5px;" />
-                            </td>
-                            <td><span id="sepiaValue">${defaultValues.flair.sepia}</span></td>
-                        </tr>
-                        <tr>
-                            <td>Contrast</td>
-                            <td>
-                                <input id="contrast-value" class="newValues" oninput="handleValueChange('flair');" onchange="handleValueChange('flair');" type="range" min="-0.2" max="0" step="0.005" value=${defaultValues.flair.contrast} style="margin-left: 5px;" />        
-                            </td>
-                            <td><span id="contrastValue">${defaultValues.flair.contrast}</span></td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">
-                                <button style="width: 100%; margin-top: 10px;" onclick="backToOriginal('flair');">Reset</button>
-                            </td>
-                        </tr>
-                    </table>
-                `;
-                handleValueChange('flair');
-                break;
-            case 'prime':
-                // pixels = applyBrightness(pixels, 0.1 * .3);
-                // pixels = applyContrast(pixels, 0.1 * .3);
-                // pixels = applySaturation(pixels, 0.15 * .3);
-                defaultValues.prime = {
-                    brightness: 0.1,
-                    contrast: 0.1,
-                    saturation: 0.15
-                }
-                valueContainer.innerHTML = `
-                    <table style="margin-top: 15px;">
-                        <tr>
-                            <td>Brightness</td>
-                            <td>
-                                <input id="brightness-value" class="newValues" oninput="handleValueChange('prime');" onchange="handleValueChange('prime');" type="range" min="0" max="1" step="0.05" value=${defaultValues.prime.brightness} style="margin-left: 5px;" />
-                            </td>
-                            <td><span id="brightnessValue">${defaultValues.prime.brightness}</span></td>
-                        </tr>
-                        <tr>
-                            <td>Contrast</td>
-                            <td>
-                                <input id="contrast-value" class="newValues" oninput="handleValueChange('prime');" onchange="handleValueChange('prime');" type="range" min="0" max="1" step="0.05" value=${defaultValues.prime.contrast} style="margin-left: 5px;" />        
-                            </td>
-                            <td><span id="contrastValue">${defaultValues.prime.contrast}</span></td>
-                        </tr>
-                        <tr>
-                            <td>Saturation</td>
-                            <td>
-                                <input id="saturation-value" class="newValues" oninput="handleValueChange('prime');" onchange="handleValueChange('prime');" type="range" min="0" max="1" step="0.05" value=${defaultValues.prime.saturation} style="margin-left: 5px;" />        
-                            </td>
-                            <td><span id="saturationValue">${defaultValues.prime.saturation}</span></td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">
-                                <button style="width: 100%; margin-top: 10px;" onclick="backToOriginal('prime');">Reset</button>
-                            </td>
-                        </tr>
-                    </table>
-                `;
-                handleValueChange('prime');
-                break;
             case 'glass':
                 // pixels = applyContrast(pixels, -0.15);
                 // pixels = applySaturation(pixels, 0.1);
@@ -270,16 +200,16 @@ function applyOriginalFilter(filter) {
                         <tr>
                             <td>Contrast</td>
                             <td>
-                                <input id="contrast-value" class="newValues" oninput="handleValueChange('glass');" onchange="handleValueChange('glass');" type="range" min="-0.2" max="-0.1" step="0.005" value=${defaultValues.glass.contrast} style="margin-left: 5px;" />        
+                                <input id="contrast-value" class="newValues" oninput="handleValueChange('glass');" onchange="handleValueChange('glass');" type="range" min="-0.2" max="0" step="0.01" value=${defaultValues.glass.contrast} style="margin-left: 5px;" />        
                             </td>
-                            <td><span id="contrastValue">${defaultValues.glass.contrast}</span></td>
+                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'contrast');" id="contrastValue">${defaultValues.glass.contrast}</span></td>
                         </tr>
                         <tr>
                             <td>Saturation</td>
                             <td>
                                 <input id="saturation-value" class="newValues" oninput="handleValueChange('glass');" onchange="handleValueChange('glass');" type="range" min="0" max="1" step="0.05" value=${defaultValues.glass.saturation} style="margin-left: 5px;" />        
                             </td>
-                            <td><span id="saturationValue">${defaultValues.glass.saturation}</span></td>
+                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'saturation');" id="saturationValue">${defaultValues.glass.saturation}</span></td>
                         </tr>
                         <tr>
                             <td colspan="3">
@@ -290,67 +220,143 @@ function applyOriginalFilter(filter) {
                 `;
                 handleValueChange('glass');
                 break;
-            case 'raw':
+            case 'flair':
+                // pixels = applySepia(pixels, 0.04 * .5);
+                // pixels = applyContrast(pixels, -0.15 * .5);
+                defaultValues.flair = {
+                    sepia: 0.04,
+                    contrast: -0.15
+                }
+                valueContainer.innerHTML = `
+                    <table style="margin-top: 15px;">
+                        <tr>
+                            <td>Sepia</td>
+                            <td>
+                                <input id="sepia-value" class="newValues" oninput="handleValueChange('flair');" onchange="handleValueChange('flair');" type="range" min="-0.5" max="0.5" step="0.005" value=${defaultValues.flair.sepia} style="margin-left: 5px;" />
+                            </td>
+                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'sepia');" id="sepiaValue">${defaultValues.flair.sepia}</span></td>
+                        </tr>
+                        <tr>
+                            <td>Contrast</td>
+                            <td>
+                                <input id="contrast-value" class="newValues" oninput="handleValueChange('flair');" onchange="handleValueChange('flair');" type="range" min="-0.2" max="0" step="0.005" value=${defaultValues.flair.contrast} style="margin-left: 5px;" />        
+                            </td>
+                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'contrast');" id="contrastValue">${defaultValues.flair.contrast}</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <button style="width: 100%; margin-top: 10px;" onclick="backToOriginal('flair');">Reset</button>
+                            </td>
+                        </tr>
+                    </table>
+                `;
+                handleValueChange('flair');
+                break;
+            case 'dusk':
+                defaultValues.dusk = {
+                    brightness: 0.1,
+                    saturation: 0.15
+                }
+                valueContainer.innerHTML = `
+                    <table style="margin-top: 15px;">
+                        <tr>
+                            <td>Brightness</td>
+                            <td>
+                                <input id="brightness-value" class="newValues" oninput="handleValueChange('dusk');" onchange="handleValueChange('dusk');" type="range" min="0" max="0.2" step="0.005" value=${defaultValues.dusk.brightness} style="margin-left: 5px;" />
+                            </td>
+                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'brightness');" id="brightnessValue">${defaultValues.dusk.brightness}</span></td>
+                        </tr>
+                        <tr>
+                            <td>Saturation</td>
+                            <td>
+                                <input id="saturation-value" class="newValues" oninput="handleValueChange('dusk');" onchange="handleValueChange('dusk');" type="range" min="0" max="1" step="0.005" value=${defaultValues.dusk.saturation} style="margin-left: 5px;" />        
+                            </td>
+                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'saturation');" id="saturationValue">${defaultValues.dusk.saturation}</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <button style="width: 100%; margin-top: 10px;" onclick="backToOriginal('dusk');">Reset</button>
+                            </td>
+                        </tr>
+                    </table>
+                `;
+                handleValueChange('dusk');
+                break;
+            case 'spotlight':
                 filterContainer.style.display = '';
                 valueContainer.style.display = 'none';
                 const canvas = fx.canvas();
                 const texture = canvas.texture(newImage);
-                canvas.draw(texture).vignette(0.1, 0.5).denoise(170).update();
+                canvas.draw(texture).vignette(0.1, 0.5).denoise(140).update();
                 const ctx = mainCanvas.getContext("2d");
                 ctx.drawImage(canvas, 0, 0, 300, 450);
                 break;
-            case 'mono':
+            case 'chrome':
                 // pixels = applyGrayscale(pixels, 1);
                 // pixels = applyContrast(pixels, 0.05);
                 // let avg = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-                defaultValues.mono = {
-                    red: 0.2126,
+                defaultValues.chrome = {
+                    red: 0.2885,
                     green: 0.7152,
-                    blue: 0.0722,
-                    contrast: 0.05
+                    blue: 0.1131,
+                    contrast: 0
                 }
                 valueContainer.innerHTML = `
                     <table style="margin-top: 5px;">
                         <tr>
                             <td>Red</td>
                             <td>
-                                <input id="red-value" class="newValues" oninput="handleValueChange('mono');" onchange="handleValueChange('mono');" type="range" min="0" max="1" step="0.0001" value=${defaultValues.mono.red} style="margin-left: 5px;" />
+                                <input id="red-value" class="newValues" oninput="handleValueChange('chrome');" onchange="handleValueChange('chrome');" type="range" min="0" max="1" step="0.0001" value=${defaultValues.chrome.red} style="margin-left: 5px;" />
                             </td>
-                            <td><span id="redValue">${defaultValues.mono.red}</span></td>
+                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'red');" id="redValue">${defaultValues.chrome.red}</span></td>
                         </tr>
                         <tr>
                             <td>Green</td>
                             <td>
-                                <input id="green-value" class="newValues" oninput="handleValueChange('mono');" onchange="handleValueChange('mono');" type="range" min="0" max="1" step="0.0001" value=${defaultValues.mono.green} style="margin-left: 5px;" />
+                                <input id="green-value" class="newValues" oninput="handleValueChange('chrome');" onchange="handleValueChange('chrome');" type="range" min="0" max="1" step="0.0001" value=${defaultValues.chrome.green} style="margin-left: 5px;" />
                             </td>
-                            <td><span id="greenValue">${defaultValues.mono.green}</span></td>
+                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'green');" id="greenValue">${defaultValues.chrome.green}</span></td>
                         </tr>
                         <tr>
                             <td>Blue</td>
                             <td>
-                                <input id="blue-value" class="newValues" oninput="handleValueChange('mono');" onchange="handleValueChange('mono');" type="range" min="0" max="1" step="0.0001" value=${defaultValues.mono.blue} style="margin-left: 5px;" />
+                                <input id="blue-value" class="newValues" oninput="handleValueChange('chrome');" onchange="handleValueChange('chrome');" type="range" min="0" max="1" step="0.0001" value=${defaultValues.chrome.blue} style="margin-left: 5px;" />
                             </td>
-                            <td><span id="blueValue">${defaultValues.mono.blue}</span></td>
+                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'blue');" id="blueValue">${defaultValues.chrome.blue}</span></td>
                         </tr>
                         <tr>
                             <td>Contrast</td>
                             <td>
-                                <input id="contrast-value" class="newValues" oninput="handleValueChange('mono');" onchange="handleValueChange('mono');" type="range" min="0" max="0.5" step="0.005" value=${defaultValues.mono.contrast} style="margin-left: 5px;" />
+                                <input id="contrast-value" class="newValues" oninput="handleValueChange('chrome');" onchange="handleValueChange('chrome');" type="range" min="0" max="0.5" step="0.005" value=${defaultValues.chrome.contrast} style="margin-left: 5px;" />
                             </td>
-                            <td><span id="contrastValue">${defaultValues.mono.contrast}</span></td>
+                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'contrast');" id="contrastValue">${defaultValues.chrome.contrast}</span></td>
                         </tr>
                         <tr>
                             <td colspan="3">
-                                <button style="width: 100%;" onclick="backToOriginal('mono');">Reset</button>
+                                <button style="width: 100%;" onclick="backToOriginal('chrome');">Reset</button>
                             </td>
                         </tr>
                     </table>
                 `;
-                handleValueChange('mono');
+                handleValueChange('chrome');
                 break;
             default:
                 break;
         }
+    }
+}
+
+function handleSpanInput(e, effect) {
+    const slider = document.getElementById(`${effect}-value`);
+    const span = document.getElementById(`${effect}Value`);
+    const key = e.keyCode || e.which;
+    if (key === 13) { // Enter
+        e.preventDefault();
+        const changeEvent = new Event('input');
+        slider.value = span.innerHTML;
+        slider.dispatchEvent(changeEvent);
+    } else if (key !== 8 && key !== 9 && key !== 46 && key !== 189 && key !== 190 && (key < 37 || key > 40) && (key < 48 || key > 57)) { // Backspace, Delete, Arrows, Period, Minus
+        e.preventDefault();
     }
 }
 
