@@ -129,6 +129,7 @@ function applyGrayscale(pixels, adj0, adj1, adj2) {
 };
 
 function updatePixels(effect, adj) {
+    console.log(adj);
     const p = new Promise((resolve) => {
         let pixels = mainCanvas.getContext("2d").getImageData(0, 0, 300, 450);
         switch (effect) {
