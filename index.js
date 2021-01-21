@@ -218,36 +218,27 @@ function applyOriginalFilter(filter) {
                 handleValueChange('glass');
                 break;
             case 'flair':
-                // pixels = applyBrightness(pixels, 0.1 * .3);
-                // pixels = applyContrast(pixels, 0.1 * .3);
-                // pixels = applySaturation(pixels, 0.15 * .3);
+                // pixels = applySepia(pixels, 0.04 * .5);
+                // pixels = applyContrast(pixels, -0.15 * .5);
                 defaultValues.flair = {
-                    brightness: 0.1,
-                    contrast: 0.1,
-                    saturation: 0.15
+                    sepia: 0.04,
+                    contrast: -0.15
                 }
                 valueContainer.innerHTML = `
                     <table style="margin-top: 15px;">
                         <tr>
-                            <td>Brightness</td>
+                            <td>Sepia</td>
                             <td>
-                                <input id="brightness-value" class="newValues" oninput="handleValueChange('flair');" onchange="handleValueChange('flair');" type="range" min="0" max="1" step="0.05" value=${defaultValues.flair.brightness} style="margin-left: 5px;" />
+                                <input id="sepia-value" class="newValues" oninput="handleValueChange('flair');" onchange="handleValueChange('flair');" type="range" min="0" max="0.5" step="0.05" value=${defaultValues.flair.sepia} style="margin-left: 5px;" />
                             </td>
-                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'brightness');" id="brightnessValue">${defaultValues.flair.brightness}</span></td>
+                            <td><span id="sepiaValue">${defaultValues.flair.sepia}</span></td>
                         </tr>
                         <tr>
                             <td>Contrast</td>
                             <td>
-                                <input id="contrast-value" class="newValues" oninput="handleValueChange('flair');" onchange="handleValueChange('flair');" type="range" min="0" max="1" step="0.05" value=${defaultValues.flair.contrast} style="margin-left: 5px;" />        
+                                <input id="contrast-value" class="newValues" oninput="handleValueChange('flair');" onchange="handleValueChange('flair');" type="range" min="-0.2" max="0" step="0.005" value=${defaultValues.flair.contrast} style="margin-left: 5px;" />        
                             </td>
-                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'contrast');" id="contrastValue">${defaultValues.flair.contrast}</span></td>
-                        </tr>
-                        <tr>
-                            <td>Saturation</td>
-                            <td>
-                                <input id="saturation-value" class="newValues" oninput="handleValueChange('flair');" onchange="handleValueChange('flair');" type="range" min="0" max="1" step="0.05" value=${defaultValues.flair.saturation} style="margin-left: 5px;" />        
-                            </td>
-                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'saturation');" id="saturationValue">${defaultValues.flair.saturation}</span></td>
+                            <td><span id="contrastValue">${defaultValues.flair.contrast}</span></td>
                         </tr>
                         <tr>
                             <td colspan="3">
