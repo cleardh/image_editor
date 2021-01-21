@@ -250,27 +250,25 @@ function applyOriginalFilter(filter) {
                 handleValueChange('flair');
                 break;
             case 'dusk':
-                // pixels = applyContrast(pixels, -0.15);
-                // pixels = applySaturation(pixels, 0.1);
                 defaultValues.dusk = {
-                    contrast: -0.15,
-                    saturation: 0.1
+                    brightness: 0.1,
+                    saturation: 0.15
                 }
                 valueContainer.innerHTML = `
                     <table style="margin-top: 15px;">
                         <tr>
-                            <td>Contrast</td>
+                            <td>Brightness</td>
                             <td>
-                                <input id="contrast-value" class="newValues" oninput="handleValueChange('dusk');" onchange="handleValueChange('dusk');" type="range" min="-0.2" max="-0.1" step="0.005" value=${defaultValues.dusk.contrast} style="margin-left: 5px;" />        
+                                <input id="brightness-value" class="newValues" oninput="handleValueChange('dusk');" onchange="handleValueChange('dusk');" type="range" min="0" max="1" step="0.05" value=${defaultValues.dusk.brightness} style="margin-left: 5px;" />
                             </td>
-                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'contrast');" id="contrastValue">${defaultValues.dusk.contrast}</span></td>
+                            <td><span id="brightnessValue">${defaultValues.dusk.brightness}</span></td>
                         </tr>
                         <tr>
                             <td>Saturation</td>
                             <td>
                                 <input id="saturation-value" class="newValues" oninput="handleValueChange('dusk');" onchange="handleValueChange('dusk');" type="range" min="0" max="1" step="0.05" value=${defaultValues.dusk.saturation} style="margin-left: 5px;" />        
                             </td>
-                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'saturation');" id="saturationValue">${defaultValues.dusk.saturation}</span></td>
+                            <td><span id="saturationValue">${defaultValues.dusk.saturation}</span></td>
                         </tr>
                         <tr>
                             <td colspan="3">
