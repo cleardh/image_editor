@@ -133,8 +133,8 @@ function updatePixels(effect, adj) {
         let pixels = mainCanvas.getContext("2d").getImageData(0, 0, 300, 450);
         switch (effect) {
             case 'glass':
-                pixels = applySepia(pixels, adj.val0 * 1);
-                pixels = applyContrast(pixels, adj.val1 * 1);
+                pixels = applySepia(pixels, adj.val0 * .5);
+                pixels = applyContrast(pixels, adj.val1 * .5);
                 break;
             case 'flair':
                 pixels = applyBrightness(pixels, adj.val0 * .3);
@@ -158,7 +158,7 @@ function updatePixels(effect, adj) {
         if (effect === 'glass' || effect === 'dusk') {
             const canvas = fx.canvas();
             const texture = canvas.texture(mainCanvas);
-            canvas.draw(texture).denoise(140).update();
+            canvas.draw(texture).denoise(175).update();
             const ctx = mainCanvas.getContext("2d");
             ctx.drawImage(canvas, 0, 0, 300, 450);
         }
@@ -283,7 +283,7 @@ function applyOriginalFilter(filter) {
                 `;
                 handleValueChange('dusk');
                 break;
-            case 'spotlight':
+            case 'prime':
                 filterContainer.style.display = '';
                 valueContainer.style.display = 'none';
                 const canvas = fx.canvas();
@@ -298,7 +298,7 @@ function applyOriginalFilter(filter) {
                 // let avg = 0.2126 * r + 0.7152 * g + 0.0722 * b;
                 defaultValues.chrome = {
                     red: 0.2885,
-                    green: 0.7152,
+                    green: 0.6,
                     blue: 0.1131,
                     contrast: 0
                 }
