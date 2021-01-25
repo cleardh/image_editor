@@ -42,11 +42,11 @@
         <div id="filter-container">
             <input type="file" name="fileOpener" id="fileOpener" />
             <div id="filters">
-                <button id="gaussian" onclick="applyFilter('gaussian')">Gaussian</button>
+                <button id="gaussian" disabled onclick="applyFilter('gaussian')">Gaussian</button>
                 <span id="gaussian-count" class="count mr-15"></span>
-                <button id="sharpen" onclick="applyFilter('sharpen')">Sharpen</button>
+                <button id="sharpen" disabled onclick="applyFilter('sharpen')">Sharpen</button>
                 <span id="sharpen-count" class="count mr-15"></span>
-                <button id="grayscale" onclick="applyFilter('grayscale')">Grayscale</button>
+                <button id="grayscale" disabled onclick="applyFilter('grayscale')">Grayscale</button>
                 <span id="grayscale-count" class="count"></span>
             </div>
             <div id="originalFilters">
@@ -60,8 +60,7 @@
         <div id="value-container" style="display: none;"></div>
         <button id="resetFilters" onclick="resetFilters();">Reset all filters</button>
     </div>
-    <script src='lena.js/dist/browser.js'></script>
-    <script src="glfx/glfx.js"></script>
+    <script src="glfx.js"></script>
     <script src='/index.js'></script>
 </body>
 </html>
