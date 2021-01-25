@@ -128,7 +128,7 @@ function applyGrayscale(pixels, adj0, adj1, adj2) {
     return pixels;
 };
 
-function updatePixels(effect, adj) {
+function updatePixels(effect, adj, denoise) {
     const p = new Promise((resolve) => {
         let pixels = mainCanvas.getContext("2d").getImageData(0, 0, 300, 450);
         switch (effect) {
@@ -158,7 +158,7 @@ function updatePixels(effect, adj) {
         if (effect === 'glass' || effect === 'dusk') {
             const canvas = fx.canvas();
             const texture = canvas.texture(mainCanvas);
-            canvas.draw(texture).denoise(175).update();
+            canvas.draw(texture).denoise(denoise * 1).update();
             const ctx = mainCanvas.getContext("2d");
             ctx.drawImage(canvas, 0, 0, 300, 450);
         }
@@ -193,7 +193,8 @@ function applyOriginalFilter(filter) {
                 // pixels = filters.contrast.apply(this, [pixels, -0.15 * .5]);
                 defaultValues.glass = {
                     sepia: 0.04,
-                    contrast: -0.15
+                    contrast: -0.15,
+                    denoise: 170
                 }
                 valueContainer.innerHTML = `
                     <table style="margin-top: 15px;">
@@ -210,6 +211,13 @@ function applyOriginalFilter(filter) {
                                 <input id="contrast-value" class="newValues" oninput="handleValueChange('glass');" onchange="handleValueChange('glass');" type="range" min="-0.2" max="0" step="0.01" value=${defaultValues.glass.contrast} style="margin-left: 5px;" />        
                             </td>
                             <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'contrast');" id="contrastValue">${defaultValues.glass.contrast}</span></td>
+                        </tr>
+                        <tr>
+                            <td>Denoise</td>
+                            <td>
+                                <input id="denoise-value" class="newValues" oninput="handleValueChange('glass');" onchange="handleValueChange('glass');" type="range" min="0" max="180" step="5" value=${defaultValues.glass.denoise} style="margin-left: 5px;" />
+                            </td>
+                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'denoise');" id="denoiseValue">${defaultValues.glass.denoise}</span></td>
                         </tr>
                         <tr>
                             <td colspan="3">
@@ -263,16 +271,24 @@ function applyOriginalFilter(filter) {
                 break;
             case 'dusk':
                 defaultValues.dusk = {
-                    brightness: 0.1
+                    brightness: -0.15,
+                    denoise: 170
                 }
                 valueContainer.innerHTML = `
                     <table style="margin-top: 15px;">
                         <tr>
                             <td>Brightness</td>
                             <td>
-                                <input id="brightness-value" class="newValues" oninput="handleValueChange('dusk');" onchange="handleValueChange('dusk');" type="range" min="0" max="0.2" step="0.005" value=${defaultValues.dusk.brightness} style="margin-left: 5px;" />
+                                <input id="brightness-value" class="newValues" oninput="handleValueChange('dusk');" onchange="handleValueChange('dusk');" type="range" min="-0.3" max="0" step="0.005" value=${defaultValues.dusk.brightness} style="margin-left: 5px;" />
                             </td>
                             <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'brightness');" id="brightnessValue">${defaultValues.dusk.brightness}</span></td>
+                        </tr>
+                        <tr>
+                            <td>Denoise</td>
+                            <td>
+                                <input id="denoise-value" class="newValues" oninput="handleValueChange('dusk');" onchange="handleValueChange('dusk');" type="range" min="0" max="180" step="5" value=${defaultValues.dusk.denoise} style="margin-left: 5px;" />
+                            </td>
+                            <td><span contentEditable="true" onkeydown="handleSpanInput(event, 'denoise');" id="denoiseValue">${defaultValues.dusk.denoise}</span></td>
                         </tr>
                         <tr>
                             <td colspan="3">
@@ -365,13 +381,18 @@ function handleValueChange(filter) {
     resetImage();
     const newValues = document.getElementsByClassName('newValues');
     const valObj = {};
+    let denoise;
     for (let i = 0; i < newValues.length; i++) {
-        valObj[`val${i}`] = newValues[i].value;
         const effect = newValues[i].id.split('-')[0];
         setValue(effect);
+        if (newValues[i].id === 'denoise-value') {
+            denoise = newValues[i].value;
+            continue;     
+        }
+        valObj[`val${i}`] = newValues[i].value;
         
     }
-    updatePixels(filter, valObj);
+    updatePixels(filter, valObj, denoise);
 }
 
 function backToOriginal(filter) {
