@@ -283,7 +283,7 @@ function applyOriginalFilter(filter) {
                 `;
                 handleValueChange('dusk');
                 break;
-            case 'prime1':
+            case 'prime':
                 filterContainer.style.display = '';
                 valueContainer.style.display = 'none';
                 const canvas = fx.canvas();
