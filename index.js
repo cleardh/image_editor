@@ -414,7 +414,7 @@ function resetFilters() {
     document.querySelectorAll('.count').forEach(count => {
         count.innerHTML = '';
     });
-    document.querySelectorAll('button').forEach(el => {
+    document.querySelectorAll('.original').forEach(el => {
         el.disabled = false;
         el.style.background = '';
         el.style.color = '';
